@@ -11,7 +11,7 @@ const Register = () => {
     e.preventDefault();
 
     const response = await fetch(
-      "https://shoe-store-fullstack-alpha.vercel.app/api/auth/register",
+      "https://backend-toko-sepatu.vercel.app/api/auth/register",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
