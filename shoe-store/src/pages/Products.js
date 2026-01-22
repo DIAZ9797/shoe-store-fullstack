@@ -9,7 +9,7 @@ export default function Products() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("https://backend-toko-sepatu.vercel.app/")
+    fetch("https://backend-toko-sepatu.vercel.app/api/products")
       .then((res) => {
         if (!res.ok) throw new Error("Gagal fetch data");
         return res.json();
