@@ -1,0 +1,65 @@
+/* src/pages/products.css */
+.products-page {
+  display: flex; /* Membagi halaman jadi 2 kolom (Sidebar + Catalog) */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  gap: 30px;
+}
+
+/* Sidebar Styling */
+.sidebar {
+  flex: 0 0 250px; /* Lebar tetap 250px */
+  padding-right: 20px;
+  border-right: 1px solid #eee;
+  display: none; /* Disembunyikan di HP, muncul di Desktop */
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    display: block;
+  }
+}
+
+.filter-group {
+  margin-bottom: 20px;
+}
+.filter-group h4 {
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+.filter-group label {
+  display: block;
+  margin-bottom: 8px;
+  cursor: pointer;
+  color: #555;
+}
+.filter-group input {
+  margin-right: 10px;
+}
+
+/* Catalog Styling */
+.catalog {
+  flex: 1;
+}
+
+.catalog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sort-select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* GRID SYSTEM (Agar Berjejer Rapi) */
+.products-grid {
+  display: grid;
+  /* Otomatis mengisi kolom, minimal lebar kartu 220px */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+}

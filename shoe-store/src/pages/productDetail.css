@@ -1,0 +1,88 @@
+.detail-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+.detail-container {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.detail-image {
+  flex: 1;
+  min-width: 300px;
+}
+.detail-image img {
+  width: 100%;
+  border-radius: 15px;
+}
+
+.detail-info {
+  flex: 1;
+  min-width: 300px;
+}
+.badge {
+  background: #111;
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+}
+.detail-info h1 {
+  margin: 15px 0 5px;
+  font-size: 2rem;
+}
+.rating {
+  color: #fca311;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+}
+.price {
+  color: #e63946;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+.desc {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.actions button {
+  padding: 12px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+.add-to-cart {
+  background: #fff;
+  border: 2px solid #111 !important;
+  color: #111;
+}
+.buy-now {
+  background: #111;
+  color: #fff;
+}
+.size-selector {
+  margin-bottom: 20px;
+}
+.size-selector button {
+  margin: 0 5px;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+.reviews-section {
+  margin-top: 50px;
+  border-top: 1px solid #eee;
+  padding-top: 30px;
+}
+.review-card {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}

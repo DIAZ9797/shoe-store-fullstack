@@ -1,0 +1,56 @@
+/* src/pages/home.css */
+.hero {
+  /* Ganti URL ini dengan gambar sepatu HD pilihanmu */
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("https://images.unsplash.com/photo-1556906781-9a412961c28c?q=80&w=1200&auto=format&fit=crop");
+  background-size: cover;
+  background-position: center;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  border-radius: 0 0 20px 20px; /* Lengkungan di bawah banner */
+}
+
+.hero-content h1 {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+.highlight {
+  color: #fca311;
+} /* Warna aksen oranye/kuning */
+.hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-button {
+  background-color: #fca311;
+  color: #111;
+  padding: 12px 30px;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 30px;
+  transition: 0.3s;
+}
+.cta-button:hover {
+  background-color: #fff;
+}
+
+.features {
+  display: flex;
+  justify-content: space-around;
+  padding: 40px 20px;
+  background: #f9f9f9;
+  margin-top: 20px;
+}
+.feature-item {
+  text-align: center;
+  font-size: 1rem;
+  color: #555;
+}

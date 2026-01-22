@@ -1,0 +1,7 @@
+# Folder sampah yang berat
+node_modules/
+/server/node_modules/
+/shoe-store/node_modules/
+
+# File Environment (Rahasia)
+.env
