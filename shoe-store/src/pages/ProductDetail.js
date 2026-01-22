@@ -8,7 +8,7 @@ export default function ProductDetail() {
   const [shoe, setShoe] = useState(null);
 
   useEffect(() => {
-    fetch(`https://shoe-store-fullstack-alpha.vercel.app/api/products/${id}`)
+    fetch(`https://backend-toko-sepatu.vercel.app/api/products/${id}`)
       .then((res) => res.json())
       .then((data) => setShoe(data));
   }, [id]);
