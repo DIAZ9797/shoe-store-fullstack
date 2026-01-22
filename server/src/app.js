@@ -24,7 +24,15 @@ mongoose
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://shoe-store-fullstack-theta.vercel.app",
+    ],
+    credentials: true,
+  }),
+);
 app.use(morgan("dev"));
 app.use(express.json());
 
