@@ -9,7 +9,7 @@ export default function Products() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/products")
+    fetch("https://shoe-store-fullstack-alpha.vercel.app/api/products")
       .then((res) => {
         if (!res.ok) throw new Error("Gagal fetch data");
         return res.json();

@@ -10,8 +10,21 @@ import ProductDetail from "./pages/ProductDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
+import React, { useEffect } from "react"; // Pastikan ada { useEffect }
+import ReactGA from "react-ga4"; // Tambahkan baris ini
+// ... biarkan import lain (seperti BrowserRouter, Navbar) di bawahnya ...
+
+const TRACKING_ID = "G-09QHK2B8GJ";
+ReactGA.initialize(TRACKING_ID);
+
 function App() {
+  // Lacak kunjungan halaman
+  useEffect(() => {
+    ReactGA.send({ hitType: "pageview", page: window.location.pathname });
+  }, []);
+
   return (
+    // ...
     // Provider ditaruh paling luar supaya data user bisa dibaca di semua page
     <AuthProvider>
       <BrowserRouter>
