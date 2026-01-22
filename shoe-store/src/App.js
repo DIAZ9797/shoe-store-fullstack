@@ -10,9 +10,9 @@ import ProductDetail from "./pages/ProductDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
-import React, { useEffect } from "react"; // Pastikan ada { useEffect }
-import ReactGA from "react-ga4"; // Tambahkan baris ini
-// ... biarkan import lain (seperti BrowserRouter, Navbar) di bawahnya ...
+import React, { useEffect } from "react";
+
+import Cart from "./pages/Cart";
 
 const TRACKING_ID = "G-09QHK2B8GJ";
 ReactGA.initialize(TRACKING_ID);
@@ -84,6 +84,7 @@ function App() {
             {/* Rute Auth */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/cart" element={<Cart />} />
           </Routes>
         </div>
       </BrowserRouter>
