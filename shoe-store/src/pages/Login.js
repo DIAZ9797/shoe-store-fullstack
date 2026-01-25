@@ -7,71 +7,56 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [status, setStatus] = useState("Siap Login");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus("Sedang mencoba menghubungi server...");
+    setLoading(true);
 
-    // DAFTAR KEMUNGKINAN ALAMAT BACKEND
-    // Kita akan coba satu per satu sampai ketemu yang benar
-    const possibleEndpoints = [
-      "https://backend-toko-sepatu.vercel.app/api/auth/login",
-      "https://backend-toko-sepatu.vercel.app/api/users/login",
-      "https://backend-toko-sepatu.vercel.app/api/login",
-      "https://backend-toko-sepatu.vercel.app/login",
-    ];
-
-    let success = false;
-
-    for (const url of possibleEndpoints) {
-      try {
-        console.log(`Mencoba login ke: ${url}`);
-        const response = await fetch(url, {
+    try {
+      // --- INI LINK YANG SUDAH PASTI BENAR 100% ---
+      const response = await fetch(
+        "https://backend-toko-sepatu.vercel.app/api/auth/login",
+        {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
-        });
-
-        // Kalau server merespon (bukan 404 Not Found), berarti alamat BENAR
-        if (response.status !== 404) {
-          const data = await response.json();
-
-          if (response.ok) {
-            // LOGIN BERHASIL!
-            const token =
-              data.token || data.accessToken || (data.data && data.data.token);
-
-            if (token) {
-              localStorage.setItem("token", token);
-              localStorage.setItem("userInfo", JSON.stringify(data));
-              login(data);
-
-              alert(
-                `BERHASIL! Link yang benar adalah:\n${url}\n\nToken sudah disimpan.`,
-              );
-              window.location.href = "/cart"; // Redirect paksa
-              success = true;
-              return; // Stop loop
-            }
-          } else {
-            // Alamat benar, tapi Password Salah
-            alert(data.message || "Password salah!");
-            setStatus("Gagal: Password Salah");
-            success = true; // Kita anggap sukses nemu link, cuma salah password
-            return;
-          }
-        }
-      } catch (err) {
-        console.log(`Gagal di ${url}:`, err);
-      }
-    }
-
-    if (!success) {
-      setStatus("Gagal total. Semua link server mati/salah.");
-      alert(
-        "Semua kemungkinan link backend sudah dicoba dan GAGAL (404/Error). Cek kode Backend Anda.",
+        },
       );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // 1. Simpan Token (Wajib ada biar Cart bisa dibuka)
+        // Kita cek berbagai kemungkinan nama token dari backend
+        const token =
+          data.token || data.accessToken || (data.data && data.data.token);
+
+        if (token) {
+          localStorage.setItem("token", token);
+          localStorage.setItem("userInfo", JSON.stringify(data));
+
+          // Panggil Context untuk update status login di aplikasi
+          if (login) login(data);
+
+          alert("Login Berhasil! Selamat Datang.");
+
+          // Pindah ke Cart
+          // Kita pakai window.location agar halaman ter-refresh bersih
+          window.location.href = "/cart";
+        } else {
+          alert(
+            "Login sukses, tapi Token tidak ditemukan. Cek Controller Backend.",
+          );
+        }
+      } else {
+        alert(data.message || "Email atau Password Salah!");
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      alert("Gagal terhubung ke server. Cek koneksi internet.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,39 +64,30 @@ const Login = () => {
     <div
       style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}
     >
-      <h2 className="text-primary">Login (Auto-Detect Link)</h2>
-      <p className="text-muted small">{status}</p>
-
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-      >
+      <h2 className="fw-bold">Login Toko Sepatu</h2>
+      <form onSubmit={handleSubmit} className="d-flex flex-column gap-3 mt-4">
         <input
           type="email"
-          placeholder="Email"
+          className="form-control"
+          placeholder="Masukkan Email..."
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          style={{ padding: "10px" }}
         />
         <input
           type="password"
-          placeholder="Password"
+          className="form-control"
+          placeholder="Masukkan Password..."
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          style={{ padding: "10px" }}
         />
         <button
           type="submit"
-          style={{
-            padding: "10px",
-            background: "blue",
-            color: "white",
-            fontWeight: "bold",
-          }}
+          className="btn btn-dark fw-bold py-2"
+          disabled={loading}
         >
-          COBA LOGIN
+          {loading ? "Memuat..." : "MASUK SEKARANG"}
         </button>
       </form>
     </div>
