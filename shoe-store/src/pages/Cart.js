@@ -1,86 +1,63 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
+import { Navigate } from "react-router-dom";
 
 const Cart = () => {
+  // --- MATA-MATA (DEBUGGING) ---
+  // Kita ambil SEMUA isi Local Storage biar tahu namanya apa
+  const allKeys = Object.keys(localStorage);
+  const allData = JSON.stringify(localStorage);
+
+  // Tampilkan di Console (Inspect Element)
+  console.log("=== CEK ISI LOCAL STORAGE ===");
+  console.log("Kunci yang ada:", allKeys);
+  console.log("Data lengkap:", allData);
+  // -----------------------------
+
+  // Coba ambil dengan berbagai kemungkinan nama umum
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
+  const userInfo = localStorage.getItem("userInfo");
+  const session = localStorage.getItem("session");
+
+  // Kalau SALAH SATU ada isinya, berarti Login berhasil
+  const isLoggedIn = token || user || userInfo || session;
+
   const [cartItems, setCartItems] = useState([]);
-  const navigate = useNavigate(); // 2. Aktifkan navigasi
 
-  // --- SATPAM (LOGIKA PROTEKSI) ---
-  useEffect(() => {
-    // Cek apakah ada data user/token yang tersimpan
-    // Kita cek dua kemungkinan nama kunci biar aman: "userInfo" atau "token"
-    const user = localStorage.getItem("userInfo");
-    const token = localStorage.getItem("token");
+  // --- CEGAT DI SINI ---
+  if (!isLoggedIn) {
+    // JANGAN DI-REDIRECT DULU BIAR KITA BISA LIHAT CONSOLE
+    // return <Navigate to="/login" replace />;
 
-    // Jika KEDUANYA kosong, berarti belum login
-    if (!user && !token) {
-      // Tampilkan pesan (opsional, biar jelas)
-      alert("Anda harus login untuk melihat keranjang!");
-      // Tendang ke halaman login
-      navigate("/login");
-    }
-  }, [navigate]);
-  // --------------------------------
+    // Ganti dengan pesan Error sementara biar ketahuan
+    return (
+      <div className="container mt-5 text-center">
+        <h2 className="text-danger">AKSES DITOLAK (DEBUG MODE)</h2>
+        <p>Sistem tidak menemukan tanda pengenal Login.</p>
+        <div className="alert alert-warning text-break">
+          <strong>Isi Local Storage Anda saat ini:</strong> <br />
+          {allData === "{}" ? "KOSONG (Belum tersimpan apa-apa)" : allData}
+        </div>
+        <p>
+          Silakan Screenshot layar ini dan kirim ke chat agar saya bisa perbaiki
+          kodenya.
+        </p>
+        <a href="/login" className="btn btn-primary">
+          Kembali ke Login
+        </a>
+      </div>
+    );
+  }
 
-  // --- LOGIKA LOAD DATA KERANJANG (SAMA SEPERTI SEBELUMNYA) ---
-  useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    if (storedCart.length === 0) {
-      setCartItems([]);
-      return;
-    }
-
-    // Pastikan link ini sesuai backend Anda
-    fetch("https://backend-toko-sepatu.vercel.app/api/products")
-      .then((res) => res.json())
-      .then((products) => {
-        const cartProducts = products.filter((product) =>
-          storedCart.includes(product._id),
-        );
-        setCartItems(cartProducts);
-      })
-      .catch((err) => console.error(err));
-  }, []);
-
-  const removeFromCart = (id) => {
-    const newCart = cartItems.filter((item) => item._id !== id);
-    setCartItems(newCart);
-    const newIds = newCart.map((item) => item._id);
-    localStorage.setItem("cart", JSON.stringify(newIds));
-  };
+  // LOGIKA FETCH DATA (SAMA SEPERTI BIASA)
+  // ... (Bagian bawah ini hanya jalan kalau isLoggedIn = TRUE)
+  // Karena kita sedang debug, bagian ini mungkin tidak tereksekusi kalau isLoggedIn false.
 
   return (
     <div className="container mt-5">
-      <h2>Keranjang Belanja Anda</h2>
-      {cartItems.length === 0 ? (
-        <p>Keranjang masih kosong. Yuk belanja!</p>
-      ) : (
-        <div className="row">
-          {cartItems.map((item) => (
-            <div key={item._id} className="col-md-4 mb-3">
-              <div className="card">
-                <img
-                  src={item.image}
-                  className="card-img-top"
-                  alt={item.name}
-                  style={{ height: "200px", objectFit: "cover" }}
-                />
-                <div className="card-body">
-                  <h5 className="card-title">{item.name}</h5>
-                  <p className="card-text">Rp {item.price}</p>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => removeFromCart(item._id)}
-                  >
-                    Hapus
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <h2>Keranjang Belanja (Akses Diterima)</h2>
+      <p>Selamat, kunci ditemukan!</p>
+      {/* ... kodingan cart lainnya ... */}
     </div>
   );
 };

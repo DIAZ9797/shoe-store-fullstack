@@ -11,24 +11,41 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Tembak API Backend
-    const response = await fetch(
-      "https://backend-toko-sepatu.vercel.app/api/auth/login",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      },
-    );
+    try {
+      // Tembak API Backend
+      const response = await fetch(
+        "https://shoe-store-fullstack-alpha.vercel.app/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        },
+      );
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      login(data); // Simpan token ke Context
-      alert("Login Berhasil!");
-      navigate("/"); // Pindah ke Home
-    } else {
-      alert(data.message); // Tampilkan error
+      if (response.ok) {
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
+
+        // 2. Simpan Info User lengkap (buat jaga-jaga)
+        localStorage.setItem("userInfo", JSON.stringify(data));
+
+        // 3. Update state aplikasi
+        login(data);
+
+        alert("Login Berhasil! Token disimpan.");
+
+        // 4. Pindah ke halaman Cart (sesuai tujuan awal) atau Home
+        navigate("/cart");
+        // -----------------------------------
+      } else {
+        alert(data.message || "Login gagal, periksa email/password");
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      alert("Gagal terhubung ke server.");
     }
   };
 
@@ -59,7 +76,12 @@ const Login = () => {
         />
         <button
           type="submit"
-          style={{ padding: "10px", background: "black", color: "white" }}
+          style={{
+            padding: "10px",
+            background: "black",
+            color: "white",
+            cursor: "pointer",
+          }}
         >
           MASUK
         </button>
