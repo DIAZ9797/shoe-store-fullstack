@@ -14,7 +14,7 @@ const Login = () => {
     try {
       // Tembak API Backend
       const response = await fetch(
-        "https://shoe-store-fullstack-alpha.vercel.app/api/auth/login",
+        "https://https://backend-toko-sepatu.vercel.app/api/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
