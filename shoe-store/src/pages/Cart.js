@@ -1,75 +1,88 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom"; // 1. Import useNavigate
-import "./cart.css";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
 
-export default function Cart() {
-  const navigate = useNavigate(); // 2. Aktifkan fungsi navigasi
+const Cart = () => {
+  const [cartItems, setCartItems] = useState([]);
+  const navigate = useNavigate(); // 2. Aktifkan navigasi
 
-  // Data dummy sementara
-  const cartItems = [
-    {
-      id: 1,
-      name: "Nike Air Zoom",
-      price: 1500000,
-      img: "https://placehold.co/100",
-    },
-    {
-      id: 2,
-      name: "Adidas Ultraboost",
-      price: 2000000,
-      img: "https://placehold.co/100",
-    },
-  ];
+  // --- SATPAM (LOGIKA PROTEKSI) ---
+  useEffect(() => {
+    // Cek apakah ada data user/token yang tersimpan
+    // Kita cek dua kemungkinan nama kunci biar aman: "userInfo" atau "token"
+    const user = localStorage.getItem("userInfo");
+    const token = localStorage.getItem("token");
 
-  const total = cartItems.reduce((acc, item) => acc + item.price, 0);
+    // Jika KEDUANYA kosong, berarti belum login
+    if (!user && !token) {
+      // Tampilkan pesan (opsional, biar jelas)
+      alert("Anda harus login untuk melihat keranjang!");
+      // Tendang ke halaman login
+      navigate("/login");
+    }
+  }, [navigate]);
+  // --------------------------------
+
+  // --- LOGIKA LOAD DATA KERANJANG (SAMA SEPERTI SEBELUMNYA) ---
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    if (storedCart.length === 0) {
+      setCartItems([]);
+      return;
+    }
+
+    // Pastikan link ini sesuai backend Anda
+    fetch("https://backend-toko-sepatu.vercel.app/api/products")
+      .then((res) => res.json())
+      .then((products) => {
+        const cartProducts = products.filter((product) =>
+          storedCart.includes(product._id),
+        );
+        setCartItems(cartProducts);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
+  const removeFromCart = (id) => {
+    const newCart = cartItems.filter((item) => item._id !== id);
+    setCartItems(newCart);
+    const newIds = newCart.map((item) => item._id);
+    localStorage.setItem("cart", JSON.stringify(newIds));
+  };
 
   return (
-    <div className="cart-page">
-      <h2>🛒 Keranjang Belanja</h2>
-
-      {cartItems.length > 0 ? (
-        <div className="cart-container">
-          <div className="cart-items">
-            {cartItems.map((item) => (
-              <div key={item.id} className="cart-item">
-                <img src={item.img} alt={item.name} />
-                <div className="item-details">
-                  <h4>{item.name}</h4>
-                  <p>Rp {item.price.toLocaleString("id-ID")}</p>
-                </div>
-                <button className="remove-btn">Hapus</button>
-              </div>
-            ))}
-          </div>
-
-          <div className="cart-summary">
-            <h3>Ringkasan</h3>
-            <div className="summary-row">
-              <span>Total Item</span>
-              <span>{cartItems.length}</span>
-            </div>
-            <div className="summary-row total">
-              <span>Total Harga</span>
-              <span>Rp {total.toLocaleString("id-ID")}</span>
-            </div>
-
-            {/* 3. PERBAIKAN DI SINI: Tambahkan onClick */}
-            <button
-              className="checkout-btn"
-              onClick={() => navigate("/checkout")}
-            >
-              Checkout
-            </button>
-          </div>
-        </div>
+    <div className="container mt-5">
+      <h2>Keranjang Belanja Anda</h2>
+      {cartItems.length === 0 ? (
+        <p>Keranjang masih kosong. Yuk belanja!</p>
       ) : (
-        <div className="empty-cart">
-          <p>Keranjangmu masih kosong.</p>
-          <Link to="/products" className="btn">
-            Mulai Belanja
-          </Link>
+        <div className="row">
+          {cartItems.map((item) => (
+            <div key={item._id} className="col-md-4 mb-3">
+              <div className="card">
+                <img
+                  src={item.image}
+                  className="card-img-top"
+                  alt={item.name}
+                  style={{ height: "200px", objectFit: "cover" }}
+                />
+                <div className="card-body">
+                  <h5 className="card-title">{item.name}</h5>
+                  <p className="card-text">Rp {item.price}</p>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => removeFromCart(item._id)}
+                  >
+                    Hapus
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
-}
+};
+
+export default Cart;
