@@ -1,41 +1,41 @@
 import React, { useState, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Cart = () => {
-  // Cek apakah ada Token tersimpan
+  // 1. AMBIL TOKEN (TAPI JANGAN DIUSIR KALAU GAK ADA)
   const token = localStorage.getItem("token");
+  const userInfo = localStorage.getItem("userInfo");
 
-  // Logic Pengusiran: Kalau tidak ada token, jangan tampilkan halaman
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // --- Kalau lolos (ada token), baru jalankan kode di bawah ini ---
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [cartItems, setCartItems] = useState([]);
+  const [debugMsg, setDebugMsg] = useState("Menunggu data...");
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    // Ambil data keranjang dari LocalStorage
+    // Logika Fetch Data
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
 
     if (storedCart.length === 0) {
       setCartItems([]);
+      setDebugMsg("Keranjang lokal kosong (belum klik add to cart).");
       return;
     }
 
-    // Ambil detail produk dari server
+    setDebugMsg(
+      `Sedang mengambil data produk... (IDs: ${storedCart.join(", ")})`,
+    );
+
     fetch("https://backend-toko-sepatu.vercel.app/api/products")
       .then((res) => res.json())
       .then((products) => {
-        // Filter hanya produk yang ada di keranjang
         const cartProducts = products.filter((product) =>
           storedCart.includes(product._id),
         );
         setCartItems(cartProducts);
+        setDebugMsg("Data berhasil dimuat!");
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        setDebugMsg("Gagal koneksi ke Backend: " + err.message);
+      });
   }, []);
 
   const removeFromCart = (id) => {
@@ -45,12 +45,33 @@ const Cart = () => {
     localStorage.setItem("cart", JSON.stringify(newIds));
   };
 
+  // --- TAMPILAN (TANPA PENGUSIRAN) ---
   return (
     <div className="container mt-5">
+      {/* KOTAK DEBUG (UNTUK CEK STATUS) */}
+      <div className="alert alert-warning">
+        <h4 className="fw-bold">🔧 STATUS DEBUGGING</h4>
+        <p>
+          <strong>Status Login:</strong>{" "}
+          {token ? "✅ SUDAH LOGIN" : "❌ BELUM TERDETEKSI"}
+        </p>
+        <p>
+          <strong>Isi Token:</strong>{" "}
+          {token ? token.substring(0, 20) + "..." : "KOSONG"}
+        </p>
+        <p>
+          <strong>Status Data:</strong> {debugMsg}
+        </p>
+      </div>
+
       <h2 className="mb-4">🛒 Keranjang Belanja</h2>
+
       {cartItems.length === 0 ? (
-        <div className="alert alert-info">
-          Keranjang masih kosong. Yuk belanja!
+        <div className="text-center py-5">
+          <h3>Keranjang Anda Kosong</h3>
+          <Link to="/products" className="btn btn-dark mt-3">
+            Belanja Dulu Yuk
+          </Link>
         </div>
       ) : (
         <div className="row">
@@ -63,16 +84,16 @@ const Cart = () => {
                   alt={item.name}
                   style={{ height: "200px", objectFit: "cover" }}
                 />
-                <div className="card-body d-flex flex-column">
+                <div className="card-body">
                   <h5 className="card-title">{item.name}</h5>
                   <p className="card-text fw-bold text-danger">
                     Rp {item.price.toLocaleString()}
                   </p>
                   <button
-                    className="btn btn-outline-danger mt-auto"
+                    className="btn btn-outline-danger w-100"
                     onClick={() => removeFromCart(item._id)}
                   >
-                    Hapus Barang
+                    Hapus
                   </button>
                 </div>
               </div>
