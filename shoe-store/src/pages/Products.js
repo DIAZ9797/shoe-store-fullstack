@@ -31,9 +31,7 @@ export default function Products() {
       <h2>Koleksi Sepatu</h2>
 
       {/* 3. Tampilkan pesan jika data masih kosong */}
-      {shoes.length === 0 && (
-        <p>Loading data... (Pastikan Backend Server nyala)</p>
-      )}
+      {shoes.length === 0 && <p>Loading data...</p>}
 
       <div className="products-grid">
         {/* 4. Fungsi map ini yang biasanya bikin crash kalau shoes bukan array */}

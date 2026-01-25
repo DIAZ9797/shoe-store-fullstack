@@ -46,18 +46,17 @@ const Cart = () => {
     setTotalPrice(total);
   };
 
-  // --- LOGIKA TOMBOL CHECKOUT ---
+  // --- LOGIKA TOMBOL CHECKOUT (YANG BARU) ---
   const handleCheckout = () => {
     if (!token) {
       // Kalau belum login, lempar ke halaman Login
-      alert("Silakan Login dulu untuk memproses pembayaran 🙏");
+      alert("Silakan Login dulu untuk melanjutkan pembayaran 🙏");
       navigate("/login");
     } else {
-      // Kalau sudah login, lanjut (nanti dibuatkan halaman checkout)
-      alert("Fitur Pembayaran akan segera hadir! (Token Valid ✅)");
+      // Kalau sudah login, LANGSUNG PINDAH KE HALAMAN CHECKOUT
+      navigate("/checkout");
     }
   };
-
   return (
     <div
       className="container"

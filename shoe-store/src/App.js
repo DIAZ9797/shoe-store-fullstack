@@ -16,11 +16,11 @@ import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Checkout from "./pages/Checkout"; // <--- 1. TAMBAHKAN IMPORT INI
 
 const TRACKING_ID = "G-09QHK2B8GJ";
 ReactGA.initialize(TRACKING_ID);
 
-// Komponen biar pas pindah halaman langsung scroll ke atas
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -31,14 +31,13 @@ const ScrollToTop = () => {
 };
 
 function App() {
-  // --- GAYA TAMPILAN (CSS IN JS) ---
   const styles = {
     navbar: {
       display: "flex",
-      justifyContent: "space-between", // Logo di kiri, Menu di kanan
+      justifyContent: "space-between",
       alignItems: "center",
       padding: "15px 5%",
-      backgroundColor: "#111", // Hitam Premium
+      backgroundColor: "#111",
       color: "white",
       position: "sticky",
       top: 0,
@@ -55,11 +54,7 @@ function App() {
       alignItems: "center",
       gap: "10px",
     },
-    menuGroup: {
-      display: "flex",
-      alignItems: "center",
-      gap: "25px", // Jarak antar menu (Supaya tidak dempet HOMEKOLEKSI)
-    },
+    menuGroup: { display: "flex", alignItems: "center", gap: "25px" },
     link: {
       color: "#ccc",
       textDecoration: "none",
@@ -72,7 +67,7 @@ function App() {
       display: "flex",
       alignItems: "center",
       gap: "8px",
-      color: "#00d4ff", // Biru Neon
+      color: "#00d4ff",
       textDecoration: "none",
       fontWeight: "bold",
       border: "1px solid #333",
@@ -80,14 +75,10 @@ function App() {
       borderRadius: "20px",
       backgroundColor: "#222",
     },
-    loginBtn: {
-      color: "white",
-      textDecoration: "none",
-      fontWeight: "500",
-    },
+    loginBtn: { color: "white", textDecoration: "none", fontWeight: "500" },
     registerBtn: {
-      backgroundColor: "#f1c40f", // Kuning Emas
-      color: "#111", // Teks Hitam
+      backgroundColor: "#f1c40f",
+      color: "#111",
       padding: "8px 20px",
       borderRadius: "6px",
       textDecoration: "none",
@@ -97,28 +88,22 @@ function App() {
     },
     mainContainer: {
       minHeight: "85vh",
-      backgroundColor: "#f4f4f4", // Abu-abu bersih
+      backgroundColor: "#f4f4f4",
       paddingBottom: "50px",
       fontFamily: "sans-serif",
     },
   };
 
-  // State untuk efek hover sederhana
   const [hover, setHover] = useState(null);
 
   return (
     <AuthProvider>
       <BrowserRouter>
         <ScrollToTop />
-
-        {/* NAVBAR HITAM RAPI */}
         <nav style={styles.navbar}>
-          {/* LOGO KIRI */}
           <Link to="/" style={styles.brand}>
             👟 SHOE STORE
           </Link>
-
-          {/* MENU KANAN */}
           <div style={styles.menuGroup}>
             <Link
               to="/"
@@ -132,7 +117,6 @@ function App() {
             >
               HOME
             </Link>
-
             <Link
               to="/products"
               style={
@@ -145,29 +129,21 @@ function App() {
             >
               KOLEKSI
             </Link>
-
-            {/* Garis Pembatas Vertikal */}
             <div
               style={{ width: "1px", height: "24px", backgroundColor: "#444" }}
             ></div>
-
-            {/* Keranjang */}
             <Link to="/cart" style={styles.cartBtn}>
               🛒 Keranjang
             </Link>
-
-            {/* Login & Register */}
             <Link to="/login" style={styles.loginBtn}>
               Masuk
             </Link>
-
             <Link to="/register" style={styles.registerBtn}>
               Daftar
             </Link>
           </div>
         </nav>
 
-        {/* KONTEN UTAMA */}
         <div style={styles.mainContainer}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -176,6 +152,8 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            {/* 2. TAMBAHKAN RUTE INI */}
+            <Route path="/checkout" element={<Checkout />} />
           </Routes>
         </div>
       </BrowserRouter>
