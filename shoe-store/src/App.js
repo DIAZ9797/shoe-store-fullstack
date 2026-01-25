@@ -47,7 +47,7 @@ function App() {
                 fontSize: "1.2rem",
               }}
             >
-              HOME
+              HOME (TEST 123)
             </Link>
             <Link
               to="/products"
