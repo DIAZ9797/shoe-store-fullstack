@@ -1,65 +1,99 @@
-// src/pages/ProductDetail.js
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import "./productDetail.css"; // Buat file css baru ini
+import React, { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
 
-export default function ProductDetail() {
+const ProductDetail = () => {
   const { id } = useParams();
-  const [shoe, setShoe] = useState(null);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`https://backend-toko-sepatu.vercel.app/api/products/${id}`)
+    // Ambil data produk spesifik dari ID
+    // Jika endpoint /:id tidak ada, kita fetch semua lalu cari manual (Backup Logic)
+    fetch(`https://backend-toko-sepatu.vercel.app/api/products`)
       .then((res) => res.json())
-      .then((data) => setShoe(data));
+      .then((data) => {
+        // Cari produk yang ID-nya cocok dengan URL
+        // Pastikan ID dibandingkan sebagai string
+        const found = data.find((p) => String(p._id) === String(id));
+        setProduct(found);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, [id]);
 
-  if (!shoe) return <div className="loading">Loading...</div>;
+  // --- FUNGSI SAKTI: PAKSA MASUK KERANJANG ---
+  const handleAddToCart = () => {
+    // 1. Ambil keranjang lama
+    let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    // 2. Cek apakah barang sudah ada?
+    if (!currentCart.includes(id)) {
+      // 3. Kalau belum, masukkan ID sepatu ini
+      currentCart.push(id);
+
+      // 4. SIMPAN KE MEMORI LAPTOP (Wajib)
+      localStorage.setItem("cart", JSON.stringify(currentCart));
+
+      alert("✅ BERHASIL! Sepatu masuk keranjang.\nSilakan cek halaman Cart.");
+    } else {
+      alert("⚠️ Sepatu ini sudah ada di keranjang Anda.");
+    }
+  };
+
+  if (loading) return <h3 className="text-center mt-5">Memuat Sepatu...</h3>;
+  if (!product)
+    return (
+      <h3 className="text-center mt-5 text-danger">
+        Sepatu tidak ditemukan :(
+      </h3>
+    );
 
   return (
-    <div className="detail-page">
-      {/* Bagian Atas: Gambar & Info Utama */}
-      <div className="detail-container">
-        <div className="detail-image">
+    <div className="container mt-5">
+      <Link to="/products" className="btn btn-secondary mb-3">
+        &larr; Kembali ke Daftar
+      </Link>
+
+      <div className="row">
+        {/* Gambar Sepatu */}
+        <div className="col-md-6">
           <img
-            src={shoe.image || "https://placehold.co/500x500"}
-            alt={shoe.name}
+            src={product.image}
+            alt={product.name}
+            className="img-fluid rounded shadow"
+            style={{ width: "100%", maxHeight: "500px", objectFit: "cover" }}
           />
         </div>
 
-        <div className="detail-info">
-          <span className="badge">New Arrival</span>
-          <h1>{shoe.name}</h1>
-          <div className="rating">⭐⭐⭐⭐⭐ (120 Ulasan)</div>
-          <h2 className="price">Rp {shoe.price.toLocaleString("id-ID")}</h2>
+        {/* Info & Tombol */}
+        <div className="col-md-6">
+          <h1 className="fw-bold">{product.name}</h1>
+          <h3 className="text-danger fw-bold mb-4">
+            Rp {product.price ? product.price.toLocaleString() : "0"}
+          </h3>
+          <p className="text-muted">
+            {product.description || "Tidak ada deskripsi."}
+          </p>
+          <hr />
+          <p>
+            <strong>Stok:</strong> {product.stock} pasang
+          </p>
 
-          <p className="desc">{shoe.description}</p>
-
-          <div className="actions">
-            <div className="size-selector">
-              <span>Size:</span>
-              <button>40</button>
-              <button>41</button>
-              <button>42</button>
-              <button>43</button>
-            </div>
-            <button className="add-to-cart">Masuk Keranjang</button>
-            <button className="buy-now">Beli Sekarang</button>
-          </div>
-        </div>
-      </div>
-
-      {/* Bagian Bawah: Tab Ulasan */}
-      <div className="reviews-section">
-        <h3>Ulasan Pembeli</h3>
-        <div className="review-card">
-          <strong>Budi Santoso</strong> <span>⭐⭐⭐⭐⭐</span>
-          <p>Barang original, pengiriman cepat. Mantap!</p>
-        </div>
-        <div className="review-card">
-          <strong>Siti Aminah</strong> <span>⭐⭐⭐⭐</span>
-          <p>Sepatunya nyaman dipakai lari, tapi box agak penyok dikit.</p>
+          {/* TOMBOL YANG SUDAH DIPERBAIKI */}
+          <button
+            onClick={handleAddToCart}
+            className="btn btn-primary btn-lg w-100 fw-bold mt-3"
+            style={{ height: "60px", fontSize: "1.2rem" }}
+          >
+            + MASUKKAN KERANJANG
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default ProductDetail;
