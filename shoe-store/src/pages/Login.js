@@ -12,9 +12,8 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      // Tembak API Backend
       const response = await fetch(
-        "https://https://backend-toko-sepatu.vercel.app/api/auth/login",
+        "https://backend-toko-sepatu.vercel.app/api/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -24,28 +23,39 @@ const Login = () => {
 
       const data = await response.json();
 
+      // --- DETEKTIF MULAI BEKERJA ---
+      // Kita paksa munculkan apa isi 'data' sebenarnya
+      alert("ISI DATA DARI SERVER:\n" + JSON.stringify(data, null, 2));
+      console.log("Full Data:", data);
+      // ------------------------------
+
       if (response.ok) {
-        if (data.token) {
-          localStorage.setItem("token", data.token);
+        // Cek paksa: Apakah token ada?
+        const tokenYangDidapat =
+          data.token || data.accessToken || (data.data && data.data.token);
+
+        if (tokenYangDidapat) {
+          localStorage.setItem("token", tokenYangDidapat);
+          localStorage.setItem("userInfo", JSON.stringify(data));
+
+          // Panggil Context
+          if (login) login(data);
+
+          alert("Token BERHASIL disimpan: " + tokenYangDidapat);
+
+          // Redirect manual biar yakin
+          window.location.href = "/cart";
+        } else {
+          alert(
+            "GAWAT! Login sukses tapi Token TIDAK DITEMUKAN di dalam data server.",
+          );
         }
-
-        // 2. Simpan Info User lengkap (buat jaga-jaga)
-        localStorage.setItem("userInfo", JSON.stringify(data));
-
-        // 3. Update state aplikasi
-        login(data);
-
-        alert("Login Berhasil! Token disimpan.");
-
-        // 4. Pindah ke halaman Cart (sesuai tujuan awal) atau Home
-        navigate("/cart");
-        // -----------------------------------
       } else {
-        alert(data.message || "Login gagal, periksa email/password");
+        alert(data.message || "Login Gagal");
       }
     } catch (error) {
       console.error("Login Error:", error);
-      alert("Gagal terhubung ke server.");
+      alert("Error Jaringan: " + error.message);
     }
   };
 
@@ -53,7 +63,7 @@ const Login = () => {
     <div
       style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}
     >
-      <h2>Login Dulu Bos</h2>
+      <h2>Login (Mode Detektif)</h2>
       <form
         onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column", gap: "10px" }}
@@ -78,12 +88,12 @@ const Login = () => {
           type="submit"
           style={{
             padding: "10px",
-            background: "black",
+            background: "red",
             color: "white",
-            cursor: "pointer",
+            fontWeight: "bold",
           }}
         >
-          MASUK
+          CEK LOGIN SEKARANG
         </button>
       </form>
     </div>
