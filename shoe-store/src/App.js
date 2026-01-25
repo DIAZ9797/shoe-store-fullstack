@@ -13,8 +13,6 @@ import Cart from "./pages/Cart"; // Pastikan file ini ada
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
-import ProtectedRoute from "./components/ProtectedRoute";
-
 // KODE GOOGLE ANALYTICS ANDA
 const TRACKING_ID = "G-09QHK2B8GJ";
 ReactGA.initialize(TRACKING_ID);
