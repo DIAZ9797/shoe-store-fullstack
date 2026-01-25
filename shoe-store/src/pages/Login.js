@@ -7,55 +7,71 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [status, setStatus] = useState("Siap Login");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setStatus("Sedang mencoba menghubungi server...");
 
-    try {
-      const response = await fetch(
-        "https://backend-toko-sepatu.vercel.app/api/auth/login",
-        {
+    // DAFTAR KEMUNGKINAN ALAMAT BACKEND
+    // Kita akan coba satu per satu sampai ketemu yang benar
+    const possibleEndpoints = [
+      "https://backend-toko-sepatu.vercel.app/api/auth/login",
+      "https://backend-toko-sepatu.vercel.app/api/users/login",
+      "https://backend-toko-sepatu.vercel.app/api/login",
+      "https://backend-toko-sepatu.vercel.app/login",
+    ];
+
+    let success = false;
+
+    for (const url of possibleEndpoints) {
+      try {
+        console.log(`Mencoba login ke: ${url}`);
+        const response = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password }),
-        },
-      );
+        });
 
-      const data = await response.json();
+        // Kalau server merespon (bukan 404 Not Found), berarti alamat BENAR
+        if (response.status !== 404) {
+          const data = await response.json();
 
-      // --- DETEKTIF MULAI BEKERJA ---
-      // Kita paksa munculkan apa isi 'data' sebenarnya
-      alert("ISI DATA DARI SERVER:\n" + JSON.stringify(data, null, 2));
-      console.log("Full Data:", data);
-      // ------------------------------
+          if (response.ok) {
+            // LOGIN BERHASIL!
+            const token =
+              data.token || data.accessToken || (data.data && data.data.token);
 
-      if (response.ok) {
-        // Cek paksa: Apakah token ada?
-        const tokenYangDidapat =
-          data.token || data.accessToken || (data.data && data.data.token);
+            if (token) {
+              localStorage.setItem("token", token);
+              localStorage.setItem("userInfo", JSON.stringify(data));
+              login(data);
 
-        if (tokenYangDidapat) {
-          localStorage.setItem("token", tokenYangDidapat);
-          localStorage.setItem("userInfo", JSON.stringify(data));
-
-          // Panggil Context
-          if (login) login(data);
-
-          alert("Token BERHASIL disimpan: " + tokenYangDidapat);
-
-          // Redirect manual biar yakin
-          window.location.href = "/cart";
-        } else {
-          alert(
-            "GAWAT! Login sukses tapi Token TIDAK DITEMUKAN di dalam data server.",
-          );
+              alert(
+                `BERHASIL! Link yang benar adalah:\n${url}\n\nToken sudah disimpan.`,
+              );
+              window.location.href = "/cart"; // Redirect paksa
+              success = true;
+              return; // Stop loop
+            }
+          } else {
+            // Alamat benar, tapi Password Salah
+            alert(data.message || "Password salah!");
+            setStatus("Gagal: Password Salah");
+            success = true; // Kita anggap sukses nemu link, cuma salah password
+            return;
+          }
         }
-      } else {
-        alert(data.message || "Login Gagal");
+      } catch (err) {
+        console.log(`Gagal di ${url}:`, err);
       }
-    } catch (error) {
-      console.error("Login Error:", error);
-      alert("Error Jaringan: " + error.message);
+    }
+
+    if (!success) {
+      setStatus("Gagal total. Semua link server mati/salah.");
+      alert(
+        "Semua kemungkinan link backend sudah dicoba dan GAGAL (404/Error). Cek kode Backend Anda.",
+      );
     }
   };
 
@@ -63,7 +79,9 @@ const Login = () => {
     <div
       style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}
     >
-      <h2>Login (Mode Detektif)</h2>
+      <h2 className="text-primary">Login (Auto-Detect Link)</h2>
+      <p className="text-muted small">{status}</p>
+
       <form
         onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column", gap: "10px" }}
@@ -88,12 +106,12 @@ const Login = () => {
           type="submit"
           style={{
             padding: "10px",
-            background: "red",
+            background: "blue",
             color: "white",
             fontWeight: "bold",
           }}
         >
-          CEK LOGIN SEKARANG
+          COBA LOGIN
         </button>
       </form>
     </div>
