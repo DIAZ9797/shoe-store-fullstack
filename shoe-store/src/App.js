@@ -16,7 +16,8 @@ import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Checkout from "./pages/Checkout"; // <--- 1. TAMBAHKAN IMPORT INI
+import Checkout from "./pages/Checkout";
+import Profile from "./pages/Profile"; // <--- IMPORT HALAMAN BARU
 
 const TRACKING_ID = "G-09QHK2B8GJ";
 ReactGA.initialize(TRACKING_ID);
@@ -31,6 +32,10 @@ const ScrollToTop = () => {
 };
 
 function App() {
+  // Cek Status Login Langsung dari Local Storage
+  const token = localStorage.getItem("token");
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
   const styles = {
     navbar: {
       display: "flex",
@@ -75,6 +80,8 @@ function App() {
       borderRadius: "20px",
       backgroundColor: "#222",
     },
+
+    // Style Tombol Auth (Login/Register)
     loginBtn: { color: "white", textDecoration: "none", fontWeight: "500" },
     registerBtn: {
       backgroundColor: "#f1c40f",
@@ -86,6 +93,25 @@ function App() {
       fontSize: "0.9rem",
       border: "none",
     },
+
+    // Style Menu Akun (Kalau sudah login)
+    userMenu: { display: "flex", alignItems: "center", gap: "15px" },
+    userName: {
+      color: "#f1c40f",
+      fontWeight: "bold",
+      fontSize: "0.9rem",
+      textTransform: "uppercase",
+    },
+    profileLink: {
+      color: "white",
+      border: "1px solid #555",
+      padding: "5px 15px",
+      borderRadius: "20px",
+      textDecoration: "none",
+      fontSize: "0.85rem",
+      transition: "0.3s",
+    },
+
     mainContainer: {
       minHeight: "85vh",
       backgroundColor: "#f4f4f4",
@@ -104,6 +130,7 @@ function App() {
           <Link to="/" style={styles.brand}>
             👟 SHOE STORE
           </Link>
+
           <div style={styles.menuGroup}>
             <Link
               to="/"
@@ -129,18 +156,38 @@ function App() {
             >
               KOLEKSI
             </Link>
+
             <div
               style={{ width: "1px", height: "24px", backgroundColor: "#444" }}
             ></div>
+
             <Link to="/cart" style={styles.cartBtn}>
               🛒 Keranjang
             </Link>
-            <Link to="/login" style={styles.loginBtn}>
-              Masuk
-            </Link>
-            <Link to="/register" style={styles.registerBtn}>
-              Daftar
-            </Link>
+
+            {/* --- LOGIKA NAVIGASI (PENTING) --- */}
+            {token ? (
+              // JIKA SUDAH LOGIN: Tampilkan Nama & Menu Akun
+              <div style={styles.userMenu}>
+                <span style={styles.userName}>
+                  Hi, {userInfo?.name?.split(" ")[0] || "User"}
+                </span>
+                <Link to="/profile" style={styles.profileLink}>
+                  ⚙️ Akun Saya
+                </Link>
+              </div>
+            ) : (
+              // JIKA BELUM LOGIN: Tampilkan Masuk & Daftar
+              <>
+                <Link to="/login" style={styles.loginBtn}>
+                  Masuk
+                </Link>
+                <Link to="/register" style={styles.registerBtn}>
+                  Daftar
+                </Link>
+              </>
+            )}
+            {/* ---------------------------------- */}
           </div>
         </nav>
 
@@ -150,10 +197,14 @@ function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+
+            {/* Rute Auth */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            {/* 2. TAMBAHKAN RUTE INI */}
-            <Route path="/checkout" element={<Checkout />} />
+
+            {/* Rute Baru */}
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </div>
       </BrowserRouter>
