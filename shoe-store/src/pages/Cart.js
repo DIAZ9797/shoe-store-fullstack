@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
+  // Cek Status Login
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+
   useEffect(() => {
+    // 1. Ambil ID barang dari Local Storage laptop (Bukan dari Server)
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
 
     if (storedCart.length === 0) {
@@ -13,15 +18,17 @@ const Cart = () => {
       return;
     }
 
+    // 2. Ambil detail produk dari Server
     fetch("https://backend-toko-sepatu.vercel.app/api/products")
       .then((res) => res.json())
       .then((products) => {
+        // Filter produk yang ada di keranjang kita
         const cartProducts = products.filter((product) =>
           storedCart.includes(product._id),
         );
         setCartItems(cartProducts);
 
-        // Hitung Total Harga
+        // Hitung Total
         const total = cartProducts.reduce((sum, item) => sum + item.price, 0);
         setTotalPrice(total);
       })
@@ -31,8 +38,6 @@ const Cart = () => {
   const removeFromCart = (id) => {
     const newCart = cartItems.filter((item) => item._id !== id);
     setCartItems(newCart);
-
-    // Update Local Storage
     const newIds = newCart.map((item) => item._id);
     localStorage.setItem("cart", JSON.stringify(newIds));
 
@@ -41,80 +46,170 @@ const Cart = () => {
     setTotalPrice(total);
   };
 
+  // --- LOGIKA TOMBOL CHECKOUT ---
+  const handleCheckout = () => {
+    if (!token) {
+      // Kalau belum login, lempar ke halaman Login
+      alert("Silakan Login dulu untuk memproses pembayaran 🙏");
+      navigate("/login");
+    } else {
+      // Kalau sudah login, lanjut (nanti dibuatkan halaman checkout)
+      alert("Fitur Pembayaran akan segera hadir! (Token Valid ✅)");
+    }
+  };
+
   return (
-    <div className="container py-5">
-      <h2 className="mb-4 fw-bold">🛒 Keranjang Belanja</h2>
+    <div
+      className="container"
+      style={{ maxWidth: "1000px", margin: "40px auto", padding: "20px" }}
+    >
+      <h2 style={{ fontWeight: "bold", marginBottom: "30px" }}>
+        🛒 Keranjang Belanja
+      </h2>
 
       {cartItems.length === 0 ? (
-        <div className="text-center py-5 bg-white shadow-sm rounded">
-          <h4 className="text-muted">Keranjang Anda masih kosong.</h4>
-          <Link to="/products" className="btn btn-primary mt-3 px-4 py-2">
+        <div
+          style={{
+            textAlign: "center",
+            padding: "50px",
+            backgroundColor: "white",
+            borderRadius: "10px",
+          }}
+        >
+          <h4 style={{ color: "#888" }}>Keranjang Anda masih kosong.</h4>
+          <Link
+            to="/products"
+            style={{
+              display: "inline-block",
+              marginTop: "20px",
+              padding: "10px 20px",
+              backgroundColor: "#111",
+              color: "white",
+              textDecoration: "none",
+              fontWeight: "bold",
+              borderRadius: "5px",
+            }}
+          >
             Mulai Belanja
           </Link>
         </div>
       ) : (
-        <div className="row">
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "30px" }}>
           {/* Daftar Barang */}
-          <div className="col-lg-8">
+          <div style={{ flex: "2", minWidth: "300px" }}>
             {cartItems.map((item) => (
-              <div key={item._id} className="card mb-3 shadow-sm border-0">
-                <div className="row g-0 align-items-center">
-                  <div className="col-md-3">
-                    <img
-                      src={item.image}
-                      className="img-fluid rounded-start"
-                      alt={item.name}
-                      style={{
-                        height: "120px",
-                        width: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
-                  <div className="col-md-9">
-                    <div className="card-body d-flex justify-content-between align-items-center">
-                      <div>
-                        <h5 className="card-title fw-bold mb-1">{item.name}</h5>
-                        <p className="card-text text-danger fw-bold">
-                          Rp {item.price.toLocaleString()}
-                        </p>
-                      </div>
-                      <button
-                        className="btn btn-outline-danger btn-sm"
-                        onClick={() => removeFromCart(item._id)}
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  </div>
+              <div
+                key={item._id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  background: "white",
+                  padding: "15px",
+                  marginBottom: "15px",
+                  borderRadius: "10px",
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
+                }}
+              >
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    marginRight: "20px",
+                  }}
+                />
+                <div style={{ flex: "1" }}>
+                  <h4 style={{ fontSize: "1.1rem", margin: "0 0 5px 0" }}>
+                    {item.name}
+                  </h4>
+                  <p
+                    style={{ color: "#d9534f", fontWeight: "bold", margin: 0 }}
+                  >
+                    Rp {item.price.toLocaleString()}
+                  </p>
                 </div>
+                <button
+                  onClick={() => removeFromCart(item._id)}
+                  style={{
+                    background: "transparent",
+                    border: "1px solid #dc3545",
+                    color: "#dc3545",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Hapus
+                </button>
               </div>
             ))}
           </div>
 
-          {/* Ringkasan Belanja */}
-          <div className="col-lg-4">
-            <div className="card shadow-sm border-0 bg-white">
-              <div className="card-body p-4">
-                <h5 className="fw-bold mb-3">Ringkasan Belanja</h5>
-                <hr />
-                <div className="d-flex justify-content-between mb-3">
-                  <span>Total Barang:</span>
-                  <strong>{cartItems.length} pcs</strong>
-                </div>
-                <div className="d-flex justify-content-between mb-4">
-                  <span className="fw-bold">Total Harga:</span>
-                  <span className="fw-bold text-success fs-5">
-                    Rp {totalPrice.toLocaleString()}
-                  </span>
-                </div>
-                <button
-                  className="btn btn-success w-100 py-2 fw-bold"
-                  onClick={() => alert("Fitur Checkout akan segera hadir!")}
-                >
-                  LANJUT KE PEMBAYARAN
-                </button>
+          {/* Ringkasan & Tombol Bayar */}
+          <div style={{ flex: "1", minWidth: "250px" }}>
+            <div
+              style={{
+                background: "white",
+                padding: "25px",
+                borderRadius: "10px",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+              }}
+            >
+              <h3
+                style={{
+                  marginTop: 0,
+                  borderBottom: "1px solid #eee",
+                  paddingBottom: "15px",
+                }}
+              >
+                Ringkasan
+              </h3>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "10px",
+                }}
+              >
+                <span>Total Barang:</span>
+                <strong>{cartItems.length} item</strong>
               </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "30px",
+                  fontSize: "1.2rem",
+                }}
+              >
+                <span style={{ fontWeight: "bold" }}>Total Harga:</span>
+                <span style={{ fontWeight: "bold", color: "#28a745" }}>
+                  Rp {totalPrice.toLocaleString()}
+                </span>
+              </div>
+
+              {/* TOMBOL PINTAR: Cek Login Dulu */}
+              <button
+                onClick={handleCheckout}
+                style={{
+                  width: "100%",
+                  padding: "15px",
+                  backgroundColor: token ? "#28a745" : "#111", // Hijau kalau login, Hitam kalau belum
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  cursor: "pointer",
+                }}
+              >
+                {token ? "LANJUT PEMBAYARAN →" : "LOGIN UNTUK BAYAR 🔒"}
+              </button>
             </div>
           </div>
         </div>
