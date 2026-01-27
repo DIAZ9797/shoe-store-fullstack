@@ -48,26 +48,27 @@ const ProductDetail = () => {
       </h3>
     );
 
-  // GAYA LAYOUT
+  // --- STYLE RESPONSIF ---
   const containerStyle = {
     maxWidth: "1000px",
-    margin: "40px auto",
+    margin: "20px auto",
     padding: "20px",
     display: "flex",
     gap: "40px",
-    flexWrap: "wrap", // Biar aman di HP
+    flexWrap: "wrap", // <--- PENTING: Biar turun ke bawah di HP
+    justifyContent: "center",
   };
 
   const imageStyle = {
-    flex: "1",
-    minWidth: "300px",
+    flex: "1 1 300px", // Minimal lebar 300px, kalau layar <300px dia akan ngecil
+    minWidth: "280px", // Batas aman HP
     borderRadius: "10px",
     boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
   };
 
   const infoStyle = {
-    flex: "1",
-    minWidth: "300px",
+    flex: "1 1 300px",
+    minWidth: "280px",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -76,7 +77,7 @@ const ProductDetail = () => {
   return (
     <div style={containerStyle}>
       {/* GAMBAR */}
-      <div style={{ flex: "1" }}>
+      <div style={imageStyle}>
         <Link
           to="/products"
           style={{
@@ -101,16 +102,18 @@ const ProductDetail = () => {
 
       {/* INFO PRODUK */}
       <div style={infoStyle}>
-        <h1 style={{ fontSize: "2.5rem", marginBottom: "10px" }}>
+        <h1
+          style={{ fontSize: "2rem", marginBottom: "10px", lineHeight: "1.2" }}
+        >
           {product.name}
         </h1>
         <h2
-          style={{ color: "#d9534f", fontSize: "2rem", marginBottom: "20px" }}
+          style={{ color: "#d9534f", fontSize: "1.8rem", marginBottom: "20px" }}
         >
           Rp {product.price ? product.price.toLocaleString() : "0"}
         </h2>
 
-        <p style={{ color: "#666", lineHeight: "1.6", fontSize: "1.1rem" }}>
+        <p style={{ color: "#666", lineHeight: "1.6", fontSize: "1rem" }}>
           {product.description || "Deskripsi belum tersedia."}
         </p>
 
@@ -118,14 +121,14 @@ const ProductDetail = () => {
           style={{
             margin: "20px 0",
             padding: "15px",
-            backgroundColor: "#f9f9f9",
+            backgroundColor: "#fff",
+            border: "1px solid #eee",
             borderRadius: "5px",
           }}
         >
           <strong>Stok Tersedia:</strong> {product.stock} pasang
         </div>
 
-        {/* TOMBOL ADD TO CART (HITAM ELEGAN) */}
         <button
           onClick={handleAddToCart}
           style={{

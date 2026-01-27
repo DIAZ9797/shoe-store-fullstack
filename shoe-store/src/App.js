@@ -17,7 +17,7 @@ import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Checkout from "./pages/Checkout";
-import Profile from "./pages/Profile"; // <--- IMPORT HALAMAN BARU
+import Profile from "./pages/Profile";
 
 const TRACKING_ID = "G-09QHK2B8GJ";
 ReactGA.initialize(TRACKING_ID);
@@ -32,10 +32,11 @@ const ScrollToTop = () => {
 };
 
 function App() {
-  // Cek Status Login Langsung dari Local Storage
+  // Cek Status Login
   const token = localStorage.getItem("token");
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
+  // --- STYLE RESPONSIF ---
   const styles = {
     navbar: {
       display: "flex",
@@ -48,6 +49,8 @@ function App() {
       top: 0,
       zIndex: 1000,
       boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+      flexWrap: "wrap", // <--- PENTING: Supaya rapi di HP
+      gap: "15px", // Jarak antar elemen saat turun ke bawah
     },
     brand: {
       fontSize: "1.5rem",
@@ -58,8 +61,15 @@ function App() {
       display: "flex",
       alignItems: "center",
       gap: "10px",
+      whiteSpace: "nowrap", // Biar nama toko gak kepotong
     },
-    menuGroup: { display: "flex", alignItems: "center", gap: "25px" },
+    menuGroup: {
+      display: "flex",
+      alignItems: "center",
+      gap: "15px",
+      flexWrap: "wrap", // <--- Menu juga menyesuaikan di HP
+      justifyContent: "center",
+    },
     link: {
       color: "#ccc",
       textDecoration: "none",
@@ -81,7 +91,7 @@ function App() {
       backgroundColor: "#222",
     },
 
-    // Style Tombol Auth (Login/Register)
+    // Auth Buttons
     loginBtn: { color: "white", textDecoration: "none", fontWeight: "500" },
     registerBtn: {
       backgroundColor: "#f1c40f",
@@ -94,8 +104,13 @@ function App() {
       border: "none",
     },
 
-    // Style Menu Akun (Kalau sudah login)
-    userMenu: { display: "flex", alignItems: "center", gap: "15px" },
+    // User Menu
+    userMenu: {
+      display: "flex",
+      alignItems: "center",
+      gap: "15px",
+      flexWrap: "wrap",
+    },
     userName: {
       color: "#f1c40f",
       fontWeight: "bold",
@@ -156,18 +171,20 @@ function App() {
             >
               KOLEKSI
             </Link>
-
             <div
-              style={{ width: "1px", height: "24px", backgroundColor: "#444" }}
-            ></div>
-
+              style={{
+                width: "1px",
+                height: "24px",
+                backgroundColor: "#444",
+                display: "none",
+              }}
+            ></div>{" "}
+            {/* Hide separator di mobile biar rapi */}
             <Link to="/cart" style={styles.cartBtn}>
               🛒 Keranjang
             </Link>
-
-            {/* --- LOGIKA NAVIGASI (PENTING) --- */}
+            {/* LOGIKA LOGIN / LOGOUT */}
             {token ? (
-              // JIKA SUDAH LOGIN: Tampilkan Nama & Menu Akun
               <div style={styles.userMenu}>
                 <span style={styles.userName}>
                   Hi, {userInfo?.name?.split(" ")[0] || "User"}
@@ -177,7 +194,6 @@ function App() {
                 </Link>
               </div>
             ) : (
-              // JIKA BELUM LOGIN: Tampilkan Masuk & Daftar
               <>
                 <Link to="/login" style={styles.loginBtn}>
                   Masuk
@@ -187,7 +203,6 @@ function App() {
                 </Link>
               </>
             )}
-            {/* ---------------------------------- */}
           </div>
         </nav>
 
@@ -198,12 +213,8 @@ function App() {
             <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
-
-            {/* Rute Auth */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-
-            {/* Rute Baru */}
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </div>

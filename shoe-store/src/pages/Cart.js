@@ -5,12 +5,10 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
 
-  // Cek Status Login
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Ambil ID barang dari Local Storage laptop (Bukan dari Server)
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
 
     if (storedCart.length === 0) {
@@ -18,17 +16,14 @@ const Cart = () => {
       return;
     }
 
-    // 2. Ambil detail produk dari Server
     fetch("https://backend-toko-sepatu.vercel.app/api/products")
       .then((res) => res.json())
       .then((products) => {
-        // Filter produk yang ada di keranjang kita
         const cartProducts = products.filter((product) =>
           storedCart.includes(product._id),
         );
         setCartItems(cartProducts);
 
-        // Hitung Total
         const total = cartProducts.reduce((sum, item) => sum + item.price, 0);
         setTotalPrice(total);
       })
@@ -41,26 +36,23 @@ const Cart = () => {
     const newIds = newCart.map((item) => item._id);
     localStorage.setItem("cart", JSON.stringify(newIds));
 
-    // Update Harga
     const total = newCart.reduce((sum, item) => sum + item.price, 0);
     setTotalPrice(total);
   };
 
-  // --- LOGIKA TOMBOL CHECKOUT (YANG BARU) ---
   const handleCheckout = () => {
     if (!token) {
-      // Kalau belum login, lempar ke halaman Login
       alert("Silakan Login dulu untuk melanjutkan pembayaran 🙏");
       navigate("/login");
     } else {
-      // Kalau sudah login, LANGSUNG PINDAH KE HALAMAN CHECKOUT
       navigate("/checkout");
     }
   };
+
   return (
     <div
       className="container"
-      style={{ maxWidth: "1000px", margin: "40px auto", padding: "20px" }}
+      style={{ maxWidth: "1000px", margin: "20px auto", padding: "20px" }}
     >
       <h2 style={{ fontWeight: "bold", marginBottom: "30px" }}>
         🛒 Keranjang Belanja
@@ -93,9 +85,16 @@ const Cart = () => {
           </Link>
         </div>
       ) : (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "30px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap", // <--- PENTING: Supaya responsif
+            gap: "30px",
+            alignItems: "flex-start",
+          }}
+        >
           {/* Daftar Barang */}
-          <div style={{ flex: "2", minWidth: "300px" }}>
+          <div style={{ flex: "2 1 400px", minWidth: "100%" }}>
             {cartItems.map((item) => (
               <div
                 key={item._id}
@@ -121,7 +120,7 @@ const Cart = () => {
                   }}
                 />
                 <div style={{ flex: "1" }}>
-                  <h4 style={{ fontSize: "1.1rem", margin: "0 0 5px 0" }}>
+                  <h4 style={{ fontSize: "1rem", margin: "0 0 5px 0" }}>
                     {item.name}
                   </h4>
                   <p
@@ -139,6 +138,7 @@ const Cart = () => {
                     padding: "5px 10px",
                     borderRadius: "5px",
                     cursor: "pointer",
+                    fontSize: "0.8rem",
                   }}
                 >
                   Hapus
@@ -147,8 +147,8 @@ const Cart = () => {
             ))}
           </div>
 
-          {/* Ringkasan & Tombol Bayar */}
-          <div style={{ flex: "1", minWidth: "250px" }}>
+          {/* Ringkasan */}
+          <div style={{ flex: "1 1 300px", minWidth: "100%" }}>
             <div
               style={{
                 background: "white",
@@ -192,13 +192,12 @@ const Cart = () => {
                 </span>
               </div>
 
-              {/* TOMBOL PINTAR: Cek Login Dulu */}
               <button
                 onClick={handleCheckout}
                 style={{
                   width: "100%",
                   padding: "15px",
-                  backgroundColor: token ? "#28a745" : "#111", // Hijau kalau login, Hitam kalau belum
+                  backgroundColor: token ? "#28a745" : "#111",
                   color: "white",
                   border: "none",
                   borderRadius: "8px",
